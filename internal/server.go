@@ -13,11 +13,10 @@ import (
 
 type ServerDependency struct {
 	Env, Port string
-	Database  db.DatabaseHandler
 }
 
 func NewApplicationServer(dependency *ServerDependency) *http.Server {
-	repositories := repository.NewDependency(dependency.Database)
+	repositories := repository.NewDependency(db.GetGlobalDBHandler())
 	services := service.NewDependency(repositories)
 	controllers := controller.NewDependency(services)
 
