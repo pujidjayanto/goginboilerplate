@@ -73,6 +73,18 @@ func loadEnvironment() (*Environment, error) {
 	}, nil
 }
 
+func (e *Environment) DatabaseDSN() string {
+	return fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		e.Database.Host,
+		e.Database.Port,
+		e.Database.User,
+		e.Database.Password,
+		e.Database.Name,
+		e.Database.Ssl,
+	)
+}
+
 func getEnvPath() (string, error) {
 	directory, err := os.Getwd()
 	if err != nil {

@@ -78,6 +78,10 @@ func Fatal(msg string, fields ...zap.Field) {
 	logger.Fatal(msg, fields...)
 }
 
+func GetInstance() *zap.Logger {
+	return logger
+}
+
 func SyncLogger() {
 	if logger != nil {
 		_ = logger.Sync()
