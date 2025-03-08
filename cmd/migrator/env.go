@@ -64,7 +64,7 @@ func loadEnvironment() (*Environment, error) {
 
 func (e *Environment) DatabaseDSN() string {
 	return fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s timezone=UTC",
 		e.Database.Host,
 		e.Database.Port,
 		e.Database.User,
@@ -76,7 +76,7 @@ func (e *Environment) DatabaseDSN() string {
 
 func (e *Environment) TestDatabaseDSN() string {
 	return fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s timezone=UTC",
 		e.TestDatabase.Host,
 		e.TestDatabase.Port,
 		e.TestDatabase.User,

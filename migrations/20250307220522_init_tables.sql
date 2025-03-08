@@ -24,7 +24,7 @@ create table purchases (
   quantity int not null,
   created_at timestamptz default current_timestamp,
   foreign key (user_id) references users(id) on delete cascade,
-  foreign key (product_id) references products(id) on delete cascade,
+  foreign key (product_id) references products(id) on delete cascade
 );
 
 

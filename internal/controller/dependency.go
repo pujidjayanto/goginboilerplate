@@ -1,13 +1,16 @@
 package controller
 
-import "github.com/pujidjayanto/goginboilerplate/internal/service"
+import (
+	"github.com/pujidjayanto/goginboilerplate/internal/controller/user"
+	"github.com/pujidjayanto/goginboilerplate/internal/service"
+)
 
 type Dependency struct {
-	DuckController DuckController
+	UserController user.Controller
 }
 
 func NewDependency(services service.Dependency) Dependency {
 	return Dependency{
-		DuckController: NewDuckController(services.DuckService),
+		UserController: user.NewController(services.UserService),
 	}
 }

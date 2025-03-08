@@ -1,4 +1,4 @@
-package duck
+package product
 
 import (
 	"context"
@@ -14,10 +14,10 @@ type repository struct {
 	db db.DatabaseHandler
 }
 
-func NewRepository(db db.DatabaseHandler) Repository {
-	return &repository{db: db}
-}
-
 func (r *repository) CreateOne(ctx context.Context) error {
 	return nil
+}
+
+func NewRepository(db db.DatabaseHandler) Repository {
+	return &repository{db: db}
 }

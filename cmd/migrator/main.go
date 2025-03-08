@@ -101,6 +101,7 @@ func main() {
 		}
 
 		dsn := env.DatabaseDSN()
+		log.Info(dsn)
 		db, err := prepareDatabase(dsn)
 		if err != nil {
 			log.Fatal(err.Error())
@@ -138,7 +139,7 @@ func runMigration(db *sql.DB, direction string) {
 	switch direction {
 	case "up":
 		if err := goose.Up(db, migrationDir); err != nil {
-			log.Fatal("failed to run migrations")
+			log.Fatal("failed to run migrations", zap.String("error", err.Error()))
 		}
 		log.Info("Migrations applied successfully.")
 	case "down":
