@@ -10,9 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// Private global variable for the database handler
-var globalDBHandler DatabaseHandler
-
 type DatabaseHandler interface {
 	GetDB(ctx context.Context) *gorm.DB
 	RunTransaction(ctx context.Context, fc func(ctx context.Context) error) error
@@ -29,38 +26,32 @@ type contextKey string
 
 const txKey = contextKey("DBTX")
 
-func InitDatabaseHandler(dsn string) error {
+func InitDatabaseHandler(dsn string) (DatabaseHandler, error) {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
-		PrepareStmt:            true,
 		NowFunc:                func() time.Time { return time.Now().UTC() },
 	})
 	if err != nil {
-		return fmt.Errorf("error opening database connection: %w", err)
+		return nil, fmt.Errorf("error opening database connection: %w", err)
 	}
 
 	dbPool, err := db.DB()
 	if err != nil {
-		return fmt.Errorf("error opening database pool: %w", err)
+		return nil, fmt.Errorf("error opening database pool: %w", err)
 	}
 
+	// Set connection pool settings
 	dbPool.SetMaxIdleConns(10)
 	dbPool.SetMaxOpenConns(100)
 	dbPool.SetConnMaxLifetime(time.Hour)
 
+	// Database ping
 	err = dbPool.Ping()
 	if err != nil {
-		return fmt.Errorf("can't ping the db: %v", err)
+		return nil, fmt.Errorf("can't ping the db, WTF %v", err)
 	}
 
-	handler := &databaseHandler{db: db, sql: dbPool}
-	globalDBHandler = handler
-	return nil
-}
-
-// GetGlobalDBHandler provides read-only access to the global database handler
-func GetGlobalDBHandler() DatabaseHandler {
-	return globalDBHandler
+	return &databaseHandler{db: db, sql: dbPool}, nil
 }
 
 func (h *databaseHandler) GetDB(ctx context.Context) *gorm.DB {
@@ -76,10 +67,16 @@ func (h *databaseHandler) Ping(ctx context.Context) error {
 
 func (h *databaseHandler) RunTransaction(ctx context.Context, fc func(ctx context.Context) error) error {
 	return h.db.Transaction(func(tx *gorm.DB) error {
+		// Add the transaction to the context
 		return fc(context.WithValue(ctx, txKey, tx))
 	})
 }
 
 func (h *databaseHandler) Close() error {
-	return h.sql.Close()
+	err := h.sql.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

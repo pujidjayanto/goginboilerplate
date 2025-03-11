@@ -26,14 +26,15 @@ func main() {
 
 	log.ConfigureLogger(env.Server.Env)
 
-	err = db.InitDatabaseHandler(env.DatabaseDSN())
+	db, err := db.InitDatabaseHandler(env.DatabaseDSN())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
 	httpServer := internal.NewApplicationServer(&internal.ServerDependency{
-		Env:  env.Server.Env,
-		Port: env.Server.Port,
+		Env:       env.Server.Env,
+		Port:      env.Server.Port,
+		DbHandler: &db,
 	})
 
 	go func() {
@@ -47,7 +48,7 @@ func main() {
 	stop()
 	log.Info("shutting down gracefully, press Ctrl+C again to force")
 
-	if err := db.GetGlobalDBHandler().Close(); err != nil {
+	if err := db.Close(); err != nil {
 		log.Fatal("error closing connection", zap.String("error", err.Error()))
 	}
 
