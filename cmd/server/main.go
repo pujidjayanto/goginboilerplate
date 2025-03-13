@@ -33,7 +33,7 @@ func main() {
 
 	httpServer := internal.NewApplicationServer(&internal.ServerDependency{
 		Env:       env.Server.Env,
-		Port:      env.Server.Port,
+		Port:      env.ServerPort(),
 		DbHandler: &db,
 	})
 

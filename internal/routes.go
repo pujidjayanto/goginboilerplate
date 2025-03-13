@@ -6,5 +6,5 @@ import (
 )
 
 func setupRouter(g *gin.Engine, controllers controller.Dependency) {
-
+	g.POST("login", controllers.UserController.Login)
 }

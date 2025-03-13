@@ -85,6 +85,15 @@ func (e *Environment) DatabaseDSN() string {
 	)
 }
 
+func (e *Environment) ServerPort() string {
+	port := e.Server.Port
+	if port == "" {
+		port = "3000"
+	}
+
+	return fmt.Sprintf(":%s", port)
+}
+
 func getEnvPath() (string, error) {
 	directory, err := os.Getwd()
 	if err != nil {
