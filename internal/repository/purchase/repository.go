@@ -7,15 +7,15 @@ import (
 )
 
 type Repository interface {
-	CreateOne(context.Context) error
+	Create(context.Context, Purchase) error
 }
 
 type repository struct {
 	db db.DatabaseHandler
 }
 
-func (r *repository) CreateOne(ctx context.Context) error {
-	return nil
+func (r *repository) Create(ctx context.Context, purchase Purchase) error {
+	return r.db.GetDB(ctx).Create(&purchase).Error
 }
 
 func NewRepository(db db.DatabaseHandler) Repository {

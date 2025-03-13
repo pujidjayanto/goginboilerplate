@@ -7,15 +7,28 @@ import (
 )
 
 type Repository interface {
-	CreateOne(context.Context) error
+	FindAll(context.Context) ([]*Product, error)
+	FindById(context.Context, uint) (*Product, error)
 }
 
 type repository struct {
 	db db.DatabaseHandler
 }
 
-func (r *repository) CreateOne(ctx context.Context) error {
-	return nil
+func (r *repository) FindAll(ctx context.Context) ([]*Product, error) {
+	var products []*Product
+	if err := r.db.GetDB(ctx).Find(&products).Error; err != nil {
+		return nil, err
+	}
+	return products, nil
+}
+
+func (r *repository) FindById(ctx context.Context, id uint) (*Product, error) {
+	var product Product
+	if err := r.db.GetDB(ctx).First(&product, id).Error; err != nil {
+		return nil, err
+	}
+	return &product, nil
 }
 
 func NewRepository(db db.DatabaseHandler) Repository {

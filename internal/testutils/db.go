@@ -66,7 +66,7 @@ func searchup(dir string, filename string) string {
 	return searchup(path.Dir(dir), filename)
 }
 
-func NewTestDb(t *testing.T) *db.DatabaseHandler {
+func NewTestDb(t *testing.T) db.DatabaseHandler {
 	dsn, err := loadTestDatabaseDsn()
 	assert.NoError(t, err)
 
@@ -90,5 +90,5 @@ func NewTestDb(t *testing.T) *db.DatabaseHandler {
 		assert.NoError(t, err)
 	})
 
-	return &db
+	return db
 }
