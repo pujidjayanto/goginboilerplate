@@ -156,7 +156,7 @@ func runSeeds(db *sql.DB) {
 	seedDir := filepath.Join("migrations", "seeds")
 	goose.SetTableName("seed_history")
 	if err := goose.Up(db, seedDir); err != nil {
-		log.Fatal("failed to run seeds")
+		log.Fatal("failed to run seeds", zap.String("error", err.Error()))
 	}
 
 	log.Info("seeds applied successfully.")

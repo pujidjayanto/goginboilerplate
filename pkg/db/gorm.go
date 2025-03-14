@@ -26,9 +26,11 @@ type contextKey string
 
 const txKey = contextKey("DBTX")
 
+// need to pass gorm config later
 func InitDatabaseHandler(dsn string) (DatabaseHandler, error) {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
+		TranslateError:         true,
 		NowFunc:                func() time.Time { return time.Now().UTC() },
 	})
 	if err != nil {

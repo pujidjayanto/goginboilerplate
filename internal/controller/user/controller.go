@@ -1,16 +1,18 @@
 package user
 
 import (
-	"context"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pujidjayanto/goginboilerplate/internal/delivery"
 	"github.com/pujidjayanto/goginboilerplate/internal/dto"
 	"github.com/pujidjayanto/goginboilerplate/internal/service/user"
 )
 
 type Controller interface {
 	Login(*gin.Context)
+	Register(*gin.Context)
 }
 
 type controller struct {
@@ -20,23 +22,45 @@ type controller struct {
 func (c *controller) Login(ginCtx *gin.Context) {
 	var req dto.LoginRequest
 	if err := ginCtx.ShouldBindJSON(&req); err != nil {
-		ginCtx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		delivery.Failed(ginCtx, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	token, err := c.userService.Login(ginCtx.Request.Context(), req)
 	if err != nil {
-		ginCtx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		if errors.Is(err, user.ErrInvalidCredential) || errors.Is(err, user.ErrUserNotFound) {
+			delivery.Failed(ginCtx, http.StatusUnauthorized, err.Error())
+			return
+		}
+
+		delivery.Failed(ginCtx, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	ginCtx.JSON(http.StatusOK, dto.LoginResponse{Token: token})
+	delivery.Success(ginCtx, token)
+}
+
+func (c *controller) Register(ginCtx *gin.Context) {
+	var req dto.RegisterRequest
+	if err := ginCtx.ShouldBindJSON(&req); err != nil {
+		delivery.Failed(ginCtx, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err := c.userService.Register(ginCtx.Request.Context(), req)
+	if err != nil {
+		if errors.Is(err, user.ErrUserAlreadyExisted) {
+			delivery.Failed(ginCtx, http.StatusConflict, err.Error())
+			return
+		}
+
+		delivery.Failed(ginCtx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	delivery.SuccessCreated(ginCtx)
 }
 
 func NewController(uss user.Service) Controller {
 	return &controller{userService: uss}
-}
-
-func (c *controller) Create(ctx context.Context) error {
-	return nil
 }
