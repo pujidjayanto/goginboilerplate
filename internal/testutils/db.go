@@ -12,11 +12,12 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/pujidjayanto/goginboilerplate/pkg/db"
+	"github.com/pujidjayanto/goginboilerplate/pkg/envloader"
 	"github.com/stretchr/testify/assert"
 )
 
 func loadTestDatabaseDsn() (string, error) {
-	envPath, err := getEnvPath()
+	envPath, err := envloader.GetEnvPath()
 	if err != nil || strings.TrimSpace(envPath) == "" {
 		return "", fmt.Errorf("no .env file found")
 	}

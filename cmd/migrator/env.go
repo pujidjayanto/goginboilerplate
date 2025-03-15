@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
-	"path"
 	"strings"
 
 	"github.com/joho/godotenv"
+	"github.com/pujidjayanto/goginboilerplate/pkg/envloader"
 )
 
 type Database struct {
@@ -29,7 +29,7 @@ type Environment struct {
 }
 
 func loadEnvironment() (*Environment, error) {
-	envPath, err := getEnvPath()
+	envPath, err := envloader.GetEnvPath()
 	if err != nil || strings.TrimSpace(envPath) == "" {
 		return nil, fmt.Errorf("no .env file found")
 	}
@@ -84,26 +84,4 @@ func (e *Environment) TestDatabaseDSN() string {
 		e.TestDatabase.Name,
 		e.TestDatabase.Ssl,
 	)
-}
-
-func getEnvPath() (string, error) {
-	directory, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-
-	filepath := searchup(directory, ".env")
-	return filepath, nil
-}
-
-func searchup(dir string, filename string) string {
-	if dir == "/" || dir == "" || dir == "." {
-		return ""
-	}
-
-	if _, err := os.Stat(path.Join(dir, filename)); err == nil {
-		return path.Join(dir, filename)
-	}
-
-	return searchup(path.Dir(dir), filename)
 }
