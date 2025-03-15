@@ -9,6 +9,7 @@ import (
 type Repository interface {
 	FindAll(context.Context) ([]*Product, error)
 	FindById(context.Context, uint) (*Product, error)
+	Update(context.Context, *Product) error
 }
 
 type repository struct {
@@ -29,6 +30,14 @@ func (r *repository) FindById(ctx context.Context, id uint) (*Product, error) {
 		return nil, err
 	}
 	return &product, nil
+}
+
+func (r *repository) Update(ctx context.Context, product *Product) error {
+	if err := r.db.GetDB(ctx).Save(product).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func NewRepository(db db.DatabaseHandler) Repository {

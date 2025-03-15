@@ -23,17 +23,17 @@ type service struct {
 }
 
 func (s *service) Login(ctx context.Context, req dto.LoginRequest) (*dto.LoginResponse, error) {
-	usr, err := s.userRepository.FindByEmail(ctx, req.Email)
+	user, err := s.userRepository.FindByEmail(ctx, req.Email)
 	if err != nil {
 		return nil, ErrUserNotFound
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(usr.PasswordHash), []byte(req.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password))
 	if err != nil {
 		return nil, ErrInvalidCredential
 	}
 
-	token, err := generateJWT(usr.ID)
+	token, err := generateJWT(user.Id)
 	if err != nil {
 		return nil, fmt.Errorf("error generate token, %v", err)
 	}
@@ -63,10 +63,10 @@ func (s *service) Register(ctx context.Context, req dto.RegisterRequest) error {
 	return nil
 }
 
-func generateJWT(userID uint) (string, error) {
+func generateJWT(userId uint) (string, error) {
 	claims := jwt.MapClaims{
-		"user_id": userID,
-		"exp":     time.Now().Add(time.Hour * 72).Unix(),
+		"userId": userId,
+		"exp":    time.Now().Add(time.Hour * 72).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

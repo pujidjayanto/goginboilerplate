@@ -15,4 +15,7 @@ func setupRouter(g *gin.Engine, controllers controller.Dependency) {
 
 	productRoutes := secure.Group("/products")
 	productRoutes.GET("/", controllers.ProductController.Index)
+
+	purchaseRoutes := secure.Group("/purchases")
+	purchaseRoutes.POST("/", controllers.PurchaseController.Create)
 }

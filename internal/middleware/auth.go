@@ -43,6 +43,12 @@ func Authenticate() gin.HandlerFunc {
 			return
 		}
 
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			if userId, ok := claims["userId"].(float64); ok {
+				ginCtx.Set("userId", uint(userId))
+			}
+		}
+
 		ginCtx.Next()
 	}
 }

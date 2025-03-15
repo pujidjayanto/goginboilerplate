@@ -26,9 +26,10 @@ func (s *service) GetAll(ctx context.Context) (*dto.GetAllProduct, error) {
 	products := make([]*dto.ProductItem, 0)
 	for _, v := range productRecords {
 		products = append(products, &dto.ProductItem{
-			Id:    v.ID,
-			Name:  v.Name,
-			Price: strconv.FormatFloat(v.Price, 'f', -1, 64),
+			Id:       v.ID,
+			Name:     v.Name,
+			Price:    strconv.FormatFloat(v.Price, 'f', -1, 64),
+			Quantity: v.Quantity,
 		})
 	}
 

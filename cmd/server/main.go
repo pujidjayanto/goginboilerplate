@@ -26,6 +26,7 @@ func main() {
 
 	log.ConfigureLogger(env.Server.Env)
 
+	// todo: should i return pointer and pass also pointer to method that needed it?
 	db, err := db.InitDatabaseHandler(env.DatabaseDSN())
 	if err != nil {
 		log.Fatal(err.Error())

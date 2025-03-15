@@ -18,7 +18,7 @@ type ServerDependency struct {
 
 func NewApplicationServer(dependency *ServerDependency) *http.Server {
 	repositories := repository.NewDependency(*dependency.DbHandler)
-	services := service.NewDependency(repositories)
+	services := service.NewDependency(repositories, *dependency.DbHandler)
 	controllers := controller.NewDependency(services)
 
 	switch dependency.Env {
