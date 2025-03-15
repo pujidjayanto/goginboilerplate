@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -43,28 +42,6 @@ func loadTestDatabaseDsn() (string, error) {
 		password,
 		dbName,
 	), nil
-}
-
-func getEnvPath() (string, error) {
-	directory, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-
-	filepath := searchup(directory, ".env")
-	return filepath, nil
-}
-
-func searchup(dir string, filename string) string {
-	if dir == "/" || dir == "" || dir == "." {
-		return ""
-	}
-
-	if _, err := os.Stat(path.Join(dir, filename)); err == nil {
-		return path.Join(dir, filename)
-	}
-
-	return searchup(path.Dir(dir), filename)
 }
 
 func NewTestDb(t *testing.T) db.DatabaseHandler {

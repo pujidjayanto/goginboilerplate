@@ -22,13 +22,13 @@ type Migrator struct {
 	Env string
 }
 
-type Environment struct {
+type Config struct {
 	Database     Database
 	TestDatabase Database
 	Migrator     Migrator
 }
 
-func loadEnvironment() (*Environment, error) {
+func loadConfiguration() (*Config, error) {
 	envPath, err := envloader.GetEnvPath()
 	if err != nil || strings.TrimSpace(envPath) == "" {
 		return nil, fmt.Errorf("no .env file found")
@@ -39,7 +39,7 @@ func loadEnvironment() (*Environment, error) {
 		return nil, err
 	}
 
-	return &Environment{
+	return &Config{
 		Database: Database{
 			Host:     os.Getenv("DB_HOST"),
 			Port:     os.Getenv("DB_PORT"),
@@ -62,7 +62,7 @@ func loadEnvironment() (*Environment, error) {
 	}, nil
 }
 
-func (e *Environment) DatabaseDSN() string {
+func (e *Config) DatabaseDSN() string {
 	return fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s timezone=UTC",
 		e.Database.Host,
@@ -74,7 +74,7 @@ func (e *Environment) DatabaseDSN() string {
 	)
 }
 
-func (e *Environment) TestDatabaseDSN() string {
+func (e *Config) TestDatabaseDSN() string {
 	return fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s timezone=UTC",
 		e.TestDatabase.Host,

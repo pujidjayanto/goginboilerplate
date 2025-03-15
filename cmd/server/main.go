@@ -19,24 +19,19 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	env, err := loadEnvironment()
+	err := internal.LoadConfiguration()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	log.ConfigureLogger(env.Server.Env)
+	log.ConfigureLogger(internal.GlobalConfig.Server.Env)
 
-	// todo: should i return pointer and pass also pointer to method that needed it?
-	db, err := db.InitDatabaseHandler(env.DatabaseDSN())
+	db, err := db.InitDatabaseHandler(internal.GlobalConfig.DatabaseDSN())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	httpServer := internal.NewApplicationServer(&internal.ServerDependency{
-		Env:       env.Server.Env,
-		Port:      env.ServerPort(),
-		DbHandler: &db,
-	})
+	httpServer := internal.NewApplicationServer(db)
 
 	go func() {
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {

@@ -11,17 +11,12 @@ import (
 	"github.com/pujidjayanto/goginboilerplate/pkg/db"
 )
 
-type ServerDependency struct {
-	Env, Port string
-	DbHandler *db.DatabaseHandler
-}
-
-func NewApplicationServer(dependency *ServerDependency) *http.Server {
-	repositories := repository.NewDependency(*dependency.DbHandler)
-	services := service.NewDependency(repositories, *dependency.DbHandler)
+func NewApplicationServer(db db.DatabaseHandler) *http.Server {
+	repositories := repository.NewDependency(db)
+	services := service.NewDependency(repositories, db)
 	controllers := controller.NewDependency(services)
 
-	switch dependency.Env {
+	switch GlobalConfig.Server.Env {
 	case "production":
 		gin.SetMode(gin.ReleaseMode)
 	case "test":
@@ -34,7 +29,7 @@ func NewApplicationServer(dependency *ServerDependency) *http.Server {
 	setupRouter(ginEngine, controllers)
 
 	return &http.Server{
-		Addr:         dependency.Port,
+		Addr:         GlobalConfig.ServerPort(),
 		Handler:      ginEngine,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,

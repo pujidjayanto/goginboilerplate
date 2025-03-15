@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"fmt"
@@ -32,24 +32,26 @@ type Redis struct {
 	DatabaseName string
 }
 
-type Environment struct {
+type Config struct {
 	Database Database
 	Server   Server
 	Redis    Redis
 }
 
-func loadEnvironment() (*Environment, error) {
+var GlobalConfig *Config
+
+func LoadConfiguration() error {
 	envPath, err := envloader.GetEnvPath()
 	if err != nil || strings.TrimSpace(envPath) == "" {
-		return nil, fmt.Errorf("no .env file found")
+		return fmt.Errorf("no .env file found")
 	}
 
 	err = godotenv.Load(envPath)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &Environment{
+	GlobalConfig = &Config{
 		Database: Database{
 			Host:     os.Getenv("DB_HOST"),
 			Port:     os.Getenv("DB_PORT"),
@@ -70,10 +72,12 @@ func loadEnvironment() (*Environment, error) {
 			Password:     os.Getenv("REDIS_PASSWORD"),
 			DatabaseName: os.Getenv("REDIS_DB_NAME"),
 		},
-	}, nil
+	}
+
+	return nil
 }
 
-func (e *Environment) DatabaseDSN() string {
+func (e *Config) DatabaseDSN() string {
 	return fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		e.Database.Host,
@@ -85,7 +89,7 @@ func (e *Environment) DatabaseDSN() string {
 	)
 }
 
-func (e *Environment) ServerPort() string {
+func (e *Config) ServerPort() string {
 	port := e.Server.Port
 	if port == "" {
 		port = "3000"

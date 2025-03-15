@@ -68,7 +68,7 @@ func main() {
 		}
 		migrationDirection := args[0]
 
-		env, err := loadEnvironment()
+		env, err := loadConfiguration()
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -95,7 +95,7 @@ func main() {
 	}
 
 	if doSeed {
-		env, err := loadEnvironment()
+		env, err := loadConfiguration()
 		if err != nil {
 			log.Fatal(err.Error())
 		}
