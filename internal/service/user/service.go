@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/pujidjayanto/goginboilerplate/internal/config"
 	"github.com/pujidjayanto/goginboilerplate/internal/dto"
 	"github.com/pujidjayanto/goginboilerplate/internal/repository/user"
 	"golang.org/x/crypto/bcrypt"
@@ -70,7 +71,7 @@ func generateJWT(userId uint) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte("your_secret_key")) // need to pass the env to here
+	return token.SignedString([]byte(config.GlobalConfig.Server.SecretKey))
 }
 
 func NewService(ur user.Repository) Service {

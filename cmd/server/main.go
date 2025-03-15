@@ -6,7 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/pujidjayanto/goginboilerplate/internal"
+	"github.com/pujidjayanto/goginboilerplate/internal/app"
+	"github.com/pujidjayanto/goginboilerplate/internal/config"
 	"github.com/pujidjayanto/goginboilerplate/pkg/db"
 	"github.com/pujidjayanto/goginboilerplate/pkg/log"
 	"go.uber.org/zap"
@@ -19,19 +20,19 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	err := internal.LoadConfiguration()
+	err := config.LoadConfiguration()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	log.ConfigureLogger(internal.GlobalConfig.Server.Env)
+	log.ConfigureLogger(config.GlobalConfig.Server.Env)
 
-	db, err := db.InitDatabaseHandler(internal.GlobalConfig.DatabaseDSN())
+	db, err := db.InitDatabaseHandler(config.GlobalConfig.DatabaseDSN())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	httpServer := internal.NewApplicationServer(db)
+	httpServer := app.NewApplicationServer(db)
 
 	go func() {
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {

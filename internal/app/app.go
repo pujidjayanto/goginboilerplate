@@ -1,10 +1,11 @@
-package internal
+package app
 
 import (
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pujidjayanto/goginboilerplate/internal/config"
 	"github.com/pujidjayanto/goginboilerplate/internal/controller"
 	"github.com/pujidjayanto/goginboilerplate/internal/repository"
 	"github.com/pujidjayanto/goginboilerplate/internal/service"
@@ -16,7 +17,7 @@ func NewApplicationServer(db db.DatabaseHandler) *http.Server {
 	services := service.NewDependency(repositories, db)
 	controllers := controller.NewDependency(services)
 
-	switch GlobalConfig.Server.Env {
+	switch config.GlobalConfig.Server.Env {
 	case "production":
 		gin.SetMode(gin.ReleaseMode)
 	case "test":
@@ -29,7 +30,7 @@ func NewApplicationServer(db db.DatabaseHandler) *http.Server {
 	setupRouter(ginEngine, controllers)
 
 	return &http.Server{
-		Addr:         GlobalConfig.ServerPort(),
+		Addr:         config.GlobalConfig.ServerPort(),
 		Handler:      ginEngine,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,

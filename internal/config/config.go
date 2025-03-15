@@ -1,4 +1,4 @@
-package internal
+package config
 
 import (
 	"fmt"
@@ -19,9 +19,10 @@ type Database struct {
 }
 
 type Server struct {
-	Port string
-	Env  string
-	Name string
+	Port      string
+	Env       string
+	Name      string
+	SecretKey string
 }
 
 type Redis struct {
@@ -61,9 +62,10 @@ func LoadConfiguration() error {
 			Ssl:      os.Getenv("DB_SSL_MODE"),
 		},
 		Server: Server{
-			Port: os.Getenv("SERVER_PORT"),
-			Env:  os.Getenv("SERVER_ENV"),
-			Name: os.Getenv("SERVER_NAME"),
+			Port:      os.Getenv("SERVER_PORT"),
+			Env:       os.Getenv("SERVER_ENV"),
+			Name:      os.Getenv("SERVER_NAME"),
+			SecretKey: os.Getenv("SERVER_SECRET_KEY"),
 		},
 		Redis: Redis{
 			Host:         os.Getenv("REDIS_HOST"),
