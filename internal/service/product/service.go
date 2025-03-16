@@ -3,7 +3,6 @@ package product
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/pujidjayanto/goginboilerplate/internal/dto"
@@ -30,7 +29,7 @@ func (s *service) GetAll(ctx context.Context) (*dto.GetAllProductResponse, error
 		products = append(products, &dto.ProductItem{
 			Id:       v.ID,
 			Name:     v.Name,
-			Price:    strconv.FormatFloat(v.Price, 'f', -1, 64),
+			Price:    v.Price.StringFixed(2),
 			Quantity: v.Quantity,
 		})
 	}
@@ -49,7 +48,7 @@ func (s *service) GetAllPaginated(ctx context.Context, req dto.GetAllProductRequ
 		products = append(products, &dto.ProductItem{
 			Id:        v.ID,
 			Name:      v.Name,
-			Price:     strconv.FormatFloat(v.Price, 'f', -1, 64),
+			Price:     v.Price.StringFixed(2),
 			Quantity:  v.Quantity,
 			CreatedAt: v.CreatedAt.Format(time.RFC3339),
 		})
