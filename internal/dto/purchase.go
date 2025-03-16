@@ -1,7 +1,9 @@
 package dto
 
 type CreatePurchaseRequest struct {
-	UserId    uint // todo: need to pass from auth token
-	ProductId uint `json:"productId"`
-	Quantity  int  `json:"quantity"` // todo: need gte validation
+	UserId    uint
+	ProductId uint `json:"productId" binding:"required"`
+	Quantity  int  `json:"quantity" binding:"required,gt=0"`
 }
+
+// note: if need more validation use Validate() implements the binding.Validator interface

@@ -66,6 +66,7 @@ func (s *service) Register(ctx context.Context, req dto.RegisterRequest) error {
 }
 
 func generateJWT(userId uint, secret string) (string, error) {
+	// can extend the claims as required
 	claims := jwt.MapClaims{
 		"userId": userId,
 		"exp":    time.Now().Add(time.Hour * 72).Unix(),
