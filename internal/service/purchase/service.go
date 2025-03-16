@@ -9,6 +9,7 @@ import (
 	"github.com/pujidjayanto/goginboilerplate/internal/repository/product"
 	"github.com/pujidjayanto/goginboilerplate/internal/repository/purchase"
 	"github.com/pujidjayanto/goginboilerplate/pkg/db"
+	"github.com/pujidjayanto/goginboilerplate/pkg/logger"
 	"gorm.io/gorm"
 )
 
@@ -35,6 +36,7 @@ func (s *service) MakePurchase(ctx context.Context, req dto.CreatePurchaseReques
 		return ErrInsufficientProduct
 	}
 
+	// example usage of transaction
 	err = s.dbHandler.RunTransaction(ctx, func(innerCtx context.Context) error {
 		newPurchase := purchase.Purchase{
 			UserId:    req.UserId,
@@ -54,6 +56,8 @@ func (s *service) MakePurchase(ctx context.Context, req dto.CreatePurchaseReques
 			return fmt.Errorf("failed to update product, %v", err)
 		}
 
+		// example usage of logger
+		logger.Info("purchase has created", "purchaseId", newPurchase.ID)
 		return nil
 	})
 	if err != nil {

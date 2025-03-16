@@ -20,18 +20,15 @@ func NewApplicationServer(db db.DatabaseHandler) *http.Server {
 	switch config.GetEnv() {
 	case "production":
 		gin.SetMode(gin.ReleaseMode)
-	case "test":
-		gin.SetMode(gin.TestMode)
 	default:
 		gin.SetMode(gin.DebugMode)
 	}
 
-	ginEngine := gin.Default()
-	setupRouter(ginEngine, controllers)
+	handler := setupRouteHandler(controllers)
 
 	return &http.Server{
 		Addr:         config.GetPort(),
-		Handler:      ginEngine,
+		Handler:      handler,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,

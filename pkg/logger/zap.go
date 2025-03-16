@@ -18,7 +18,7 @@ func Init() {
 		cfg := zap.Config{
 			Level:         zap.NewAtomicLevelAt(zapcore.InfoLevel),
 			Development:   false,
-			Encoding:      "console",
+			Encoding:      "json",
 			DisableCaller: false,
 			EncoderConfig: zapcore.EncoderConfig{
 				TimeKey:        "timestamp",
@@ -38,7 +38,7 @@ func Init() {
 			ErrorOutputPaths: []string{"stderr"},
 		}
 
-		logger := zap.Must(cfg.Build())
+		logger := zap.Must(cfg.Build(zap.AddCallerSkip(1)))
 		sugar = logger.Sugar()
 	})
 }
