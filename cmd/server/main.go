@@ -9,49 +9,46 @@ import (
 	"github.com/pujidjayanto/goginboilerplate/internal/app"
 	"github.com/pujidjayanto/goginboilerplate/internal/config"
 	"github.com/pujidjayanto/goginboilerplate/pkg/db"
-	"github.com/pujidjayanto/goginboilerplate/pkg/log"
-	"go.uber.org/zap"
+	"github.com/pujidjayanto/goginboilerplate/pkg/logger"
 )
 
 func main() {
-	log.Init()
-	defer log.SyncLogger()
+	logger.Init()
+	defer logger.SyncLogger()
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
 	err := config.Initialize()
 	if err != nil {
-		log.Fatal(err.Error())
+		logger.Fatal("initialize configuration error", "err", err.Error())
 	}
-
-	log.ConfigureLogger(config.GetEnv())
 
 	db, err := db.InitDatabaseHandler(config.GetDatabaseDSN())
 	if err != nil {
-		log.Fatal(err.Error())
+		logger.Fatal("initialize database error", "err", err.Error())
 	}
 
 	httpServer := app.NewApplicationServer(db)
 
 	go func() {
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatal("listen: %s\n", zap.String("error", err.Error()))
+			logger.Fatal("server listened failed", "err", err.Error())
 		}
 	}()
 
 	<-ctx.Done()
 
 	stop()
-	log.Info("shutting down gracefully, press Ctrl+C again to force")
+	logger.Info("shutting down gracefully, press Ctrl+C again to force")
 
 	if err := db.Close(); err != nil {
-		log.Fatal("error closing connection", zap.String("error", err.Error()))
+		logger.Fatal("error closing connection", "err", err.Error())
 	}
 
 	if err := httpServer.Shutdown(ctx); err != nil {
-		log.Fatal("server forced to shutdown: ", zap.String("error", err.Error()))
+		logger.Fatal("server forced to shutdown", "err", err.Error())
 	}
 
-	log.Info("server exiting")
+	logger.Info("server exiting")
 }
