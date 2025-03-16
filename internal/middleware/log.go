@@ -3,50 +3,54 @@ package middleware
 import (
 	"time"
 
+	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"github.com/pujidjayanto/goginboilerplate/internal/config"
 	"github.com/pujidjayanto/goginboilerplate/pkg/logger"
 )
 
 func LogRequest() gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(ginCtx *gin.Context) {
 		start := time.Now()
-		path := c.Request.URL.Path
-		raw := c.Request.URL.RawQuery
+		path := ginCtx.Request.URL.Path
+		raw := ginCtx.Request.URL.RawQuery
 		if raw != "" {
 			path = path + "?" + raw
 		}
 
 		// Process request
-		c.Next()
+		ginCtx.Next()
 
 		// Log details after request is processed
 		latency := time.Since(start)
-		clientIP := c.ClientIP()
-		method := c.Request.Method
-		statusCode := c.Writer.Status()
+		clientIP := ginCtx.ClientIP()
+		method := ginCtx.Request.Method
+		statusCode := ginCtx.Writer.Status()
+		requestId := requestid.Get(ginCtx)
 
 		// log everything when in development
 		// other than that log only internal server error to prevent excessive log
 		if config.GetEnv() == "development" {
 			logger.Info("incoming request",
+				"request_id", requestId,
 				"status", statusCode,
 				"method", method,
 				"path", path,
 				"ip", clientIP,
 				"latency", latency,
-				"user-agent", c.Request.UserAgent(),
+				"user-agent", ginCtx.Request.UserAgent(),
 			)
 		}
 
 		if statusCode >= 500 {
 			logger.Error("server error",
+				"request_id", requestId,
 				"status", statusCode,
-				"method", c.Request.Method,
+				"method", ginCtx.Request.Method,
 				"path", path,
 				"duration", time.Since(start),
-				"ip", c.ClientIP(),
-				"errors", c.Errors.String(),
+				"ip", ginCtx.ClientIP(),
+				"errors", ginCtx.Errors.String(),
 			)
 		}
 	}

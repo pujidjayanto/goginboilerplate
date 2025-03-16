@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"github.com/pujidjayanto/goginboilerplate/internal/controller"
 	"github.com/pujidjayanto/goginboilerplate/internal/middleware"
@@ -13,7 +14,8 @@ func setupRouteHandler(controllers controller.Dependency) *gin.Engine {
 
 	// use default cors, but make sure set it properly on real server
 	g.Use(cors.Default())
-
+	g.Use(middleware.SecurityHeader())
+	g.Use(requestid.New())
 	g.Use(middleware.LogRequest())
 	g.Use(gin.Recovery())
 
