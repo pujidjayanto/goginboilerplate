@@ -27,6 +27,7 @@ func setupRouteHandler(controllers controller.Dependency) *gin.Engine {
 
 	productRoutes := secure.Group("/products")
 	productRoutes.GET("/", controllers.ProductController.Index)
+	productRoutes.GET("/paginated", controllers.ProductController.IndexPaginated)
 
 	purchaseRoutes := secure.Group("/purchases")
 	purchaseRoutes.POST("/", controllers.PurchaseController.Create)

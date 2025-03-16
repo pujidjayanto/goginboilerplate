@@ -15,3 +15,7 @@ type Product struct {
 	CreatedAt      time.Time  `gorm:"autoCreateTime"`
 	UpdatedAt      time.Time  `gorm:"autoUpdateTime"`
 }
+
+type ProductFilter struct {
+	ProductName string
+}

@@ -27,6 +27,7 @@ func main() {
 	}
 
 	db, err := db.InitDatabaseHandler(config.GetDatabaseDSN(), &gorm.Config{
+		PrepareStmt:            true,
 		SkipDefaultTransaction: true,
 		TranslateError:         true,
 		NowFunc:                func() time.Time { return time.Now().UTC() },

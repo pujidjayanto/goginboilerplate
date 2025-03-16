@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pujidjayanto/goginboilerplate/internal/delivery"
 	"github.com/pujidjayanto/goginboilerplate/internal/dto"
 	"github.com/pujidjayanto/goginboilerplate/internal/service/purchase"
+	"github.com/pujidjayanto/goginboilerplate/pkg/delivery"
 )
 
 type Controller interface {
