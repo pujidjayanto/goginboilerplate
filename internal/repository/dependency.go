@@ -13,7 +13,6 @@ type Dependency struct {
 	PurchaseRepository purchase.Repository
 }
 
-// todo: should i pass pointer to db to avoid copy?
 func NewDependency(dbHandler db.DatabaseHandler) Dependency {
 	return Dependency{
 		UserRepository:     user.NewRepository(dbHandler),

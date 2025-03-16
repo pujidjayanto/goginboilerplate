@@ -21,6 +21,7 @@ type Service interface {
 
 type service struct {
 	userRepository user.Repository
+	secretKey      string
 }
 
 func (s *service) Login(ctx context.Context, req dto.LoginRequest) (*dto.LoginResponse, error) {
@@ -34,7 +35,7 @@ func (s *service) Login(ctx context.Context, req dto.LoginRequest) (*dto.LoginRe
 		return nil, ErrInvalidCredential
 	}
 
-	token, err := generateJWT(user.Id)
+	token, err := generateJWT(user.Id, s.secretKey)
 	if err != nil {
 		return nil, fmt.Errorf("error generate token, %v", err)
 	}
@@ -64,16 +65,16 @@ func (s *service) Register(ctx context.Context, req dto.RegisterRequest) error {
 	return nil
 }
 
-func generateJWT(userId uint) (string, error) {
+func generateJWT(userId uint, secret string) (string, error) {
 	claims := jwt.MapClaims{
 		"userId": userId,
 		"exp":    time.Now().Add(time.Hour * 72).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(config.GlobalConfig.Server.SecretKey))
+	return token.SignedString([]byte(secret))
 }
 
 func NewService(ur user.Repository) Service {
-	return &service{userRepository: ur}
+	return &service{userRepository: ur, secretKey: config.GetSecretKey()}
 }

@@ -17,7 +17,7 @@ func NewApplicationServer(db db.DatabaseHandler) *http.Server {
 	services := service.NewDependency(repositories, db)
 	controllers := controller.NewDependency(services)
 
-	switch config.GlobalConfig.Server.Env {
+	switch config.GetEnv() {
 	case "production":
 		gin.SetMode(gin.ReleaseMode)
 	case "test":
@@ -30,7 +30,7 @@ func NewApplicationServer(db db.DatabaseHandler) *http.Server {
 	setupRouter(ginEngine, controllers)
 
 	return &http.Server{
-		Addr:         config.GlobalConfig.ServerPort(),
+		Addr:         config.GetPort(),
 		Handler:      ginEngine,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,

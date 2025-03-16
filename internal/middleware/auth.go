@@ -6,11 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/pujidjayanto/goginboilerplate/internal/config"
 	"github.com/pujidjayanto/goginboilerplate/internal/delivery"
 )
 
 func Authenticate() gin.HandlerFunc {
-	jwtSecret := []byte("your_secret_key") // Load from environment
+	jwtSecret := []byte(config.GetSecretKey())
 
 	return func(ginCtx *gin.Context) {
 		authHeader := ginCtx.GetHeader("Authorization")

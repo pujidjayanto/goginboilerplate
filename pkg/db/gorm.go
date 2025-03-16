@@ -26,7 +26,7 @@ type contextKey string
 
 const txKey = contextKey("DBTX")
 
-// need to pass gorm config later
+// todo: need to pass gorm config later
 func InitDatabaseHandler(dsn string) (DatabaseHandler, error) {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
@@ -42,15 +42,13 @@ func InitDatabaseHandler(dsn string) (DatabaseHandler, error) {
 		return nil, fmt.Errorf("error opening database pool: %w", err)
 	}
 
-	// Set connection pool settings
 	dbPool.SetMaxIdleConns(10)
 	dbPool.SetMaxOpenConns(100)
 	dbPool.SetConnMaxLifetime(time.Hour)
 
-	// Database ping
 	err = dbPool.Ping()
 	if err != nil {
-		return nil, fmt.Errorf("can't ping the db, WTF %v", err)
+		return nil, fmt.Errorf("can't ping the db, %v", err)
 	}
 
 	return &databaseHandler{db: db, sql: dbPool}, nil
@@ -69,7 +67,6 @@ func (h *databaseHandler) Ping(ctx context.Context) error {
 
 func (h *databaseHandler) RunTransaction(ctx context.Context, fc func(ctx context.Context) error) error {
 	return h.db.Transaction(func(tx *gorm.DB) error {
-		// Add the transaction to the context
 		return fc(context.WithValue(ctx, txKey, tx))
 	})
 }

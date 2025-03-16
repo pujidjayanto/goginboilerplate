@@ -20,14 +20,14 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	err := config.LoadConfiguration()
+	err := config.Initialize()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	log.ConfigureLogger(config.GlobalConfig.Server.Env)
+	log.ConfigureLogger(config.GetEnv())
 
-	db, err := db.InitDatabaseHandler(config.GlobalConfig.DatabaseDSN())
+	db, err := db.InitDatabaseHandler(config.GetDatabaseDSN())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
