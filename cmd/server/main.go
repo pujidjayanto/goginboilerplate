@@ -5,11 +5,13 @@ import (
 	"net/http"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/pujidjayanto/goginboilerplate/internal/app"
 	"github.com/pujidjayanto/goginboilerplate/internal/config"
 	"github.com/pujidjayanto/goginboilerplate/pkg/db"
 	"github.com/pujidjayanto/goginboilerplate/pkg/logger"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -24,7 +26,11 @@ func main() {
 		logger.Fatal("initialize configuration error", "err", err.Error())
 	}
 
-	db, err := db.InitDatabaseHandler(config.GetDatabaseDSN())
+	db, err := db.InitDatabaseHandler(config.GetDatabaseDSN(), &gorm.Config{
+		SkipDefaultTransaction: true,
+		TranslateError:         true,
+		NowFunc:                func() time.Time { return time.Now().UTC() },
+	})
 	if err != nil {
 		logger.Fatal("initialize database error", "err", err.Error())
 	}

@@ -26,13 +26,8 @@ type contextKey string
 
 const txKey = contextKey("DBTX")
 
-// todo: need to pass gorm config later
-func InitDatabaseHandler(dsn string) (DatabaseHandler, error) {
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		SkipDefaultTransaction: true,
-		TranslateError:         true,
-		NowFunc:                func() time.Time { return time.Now().UTC() },
-	})
+func InitDatabaseHandler(dsn string, gormConfig *gorm.Config) (DatabaseHandler, error) {
+	db, err := gorm.Open(postgres.Open(dsn), gormConfig)
 	if err != nil {
 		return nil, fmt.Errorf("error opening database connection: %w", err)
 	}

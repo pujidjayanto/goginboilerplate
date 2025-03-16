@@ -13,6 +13,7 @@ import (
 	"github.com/pujidjayanto/goginboilerplate/pkg/db"
 	"github.com/pujidjayanto/goginboilerplate/pkg/envloader"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 )
 
 func loadTestDatabaseDsn() (string, error) {
@@ -48,7 +49,7 @@ func NewTestDb(t *testing.T) db.DatabaseHandler {
 	dsn, err := loadTestDatabaseDsn()
 	assert.NoError(t, err)
 
-	db, err := db.InitDatabaseHandler(dsn)
+	db, err := db.InitDatabaseHandler(dsn, &gorm.Config{})
 	assert.NoError(t, err)
 
 	t.Cleanup(func() {
