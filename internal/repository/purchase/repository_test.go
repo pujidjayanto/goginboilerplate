@@ -14,7 +14,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// todo: refactor later
 func TestRepository_Create(t *testing.T) {
 	db := testutils.NewTestDb(t)
 
