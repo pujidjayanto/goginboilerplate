@@ -50,6 +50,11 @@ func NewTestDb(t *testing.T) db.DatabaseHandler {
 	database, err := db.InitDatabaseHandler(dsn, &gorm.Config{})
 	require.NoError(t, err, "Failed to initialize database")
 
+	// Register cleanup to close the database connection
+	t.Cleanup(func() {
+		database.Close()
+	})
+
 	return database
 }
 
