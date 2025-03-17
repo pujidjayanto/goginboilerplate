@@ -61,8 +61,15 @@ func (h *databaseHandler) Ping(ctx context.Context) error {
 }
 
 func (h *databaseHandler) RunTransaction(ctx context.Context, fc func(ctx context.Context) error) error {
+	// If there's already a transaction in the context, reuse it
+	if _, ok := ctx.Value(txKey).(*gorm.DB); ok {
+		return fc(ctx)
+	}
+
+	// If no transaction exists, create a new one
 	return h.db.Transaction(func(tx *gorm.DB) error {
-		return fc(context.WithValue(ctx, txKey, tx))
+		txCtx := context.WithValue(ctx, txKey, tx)
+		return fc(txCtx)
 	})
 }
 

@@ -27,7 +27,7 @@ func (s *service) GetAll(ctx context.Context) (*dto.GetAllProductResponse, error
 	products := make([]*dto.ProductItem, 0)
 	for _, v := range productRecords {
 		products = append(products, &dto.ProductItem{
-			Id:       v.ID,
+			Id:       v.Id,
 			Name:     v.Name,
 			Price:    v.Price.StringFixed(2),
 			Quantity: v.Quantity,
@@ -46,7 +46,7 @@ func (s *service) GetAllPaginated(ctx context.Context, req dto.GetAllProductRequ
 	products := make([]*dto.ProductItem, 0)
 	for _, v := range productRecords {
 		products = append(products, &dto.ProductItem{
-			Id:        v.ID,
+			Id:        v.Id,
 			Name:      v.Name,
 			Price:     v.Price.StringFixed(2),
 			Quantity:  v.Quantity,

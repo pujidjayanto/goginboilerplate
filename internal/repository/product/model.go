@@ -8,9 +8,9 @@ import (
 )
 
 type Product struct {
-	ID             uint            `gorm:"primaryKey"`
+	Id             uint            `gorm:"primaryKey"`
 	Name           string          `gorm:"not null"`
-	Price          decimal.Decimal `gorm:"not null"`
+	Price          decimal.Decimal `gorm:"not null type:decimal(10,2)"`
 	Quantity       int             `gorm:"not null"`
 	ProductDetails jsonb.JSON      `gorm:"type:jsonb"`
 	CreatedAt      time.Time       `gorm:"autoCreateTime"`

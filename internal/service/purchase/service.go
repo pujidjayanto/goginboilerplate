@@ -57,7 +57,7 @@ func (s *service) MakePurchase(ctx context.Context, req dto.CreatePurchaseReques
 		}
 
 		// example usage of logger
-		logger.Info("purchase has created", "purchaseId", newPurchase.ID)
+		logger.Info("purchase has created", "purchaseId", newPurchase.Id)
 		return nil
 	})
 	if err != nil {

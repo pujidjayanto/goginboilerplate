@@ -4,21 +4,18 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
-	"runtime"
-	"strings"
 	"testing"
 
 	"github.com/joho/godotenv"
 	"github.com/pujidjayanto/goginboilerplate/pkg/db"
 	"github.com/pujidjayanto/goginboilerplate/pkg/envloader"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 )
 
 func loadTestDatabaseDsn() (string, error) {
 	envPath, err := envloader.GetEnvPath()
-	if err != nil || strings.TrimSpace(envPath) == "" {
+	if err != nil || envPath == "" {
 		return "", fmt.Errorf("no .env file found")
 	}
 
@@ -36,7 +33,7 @@ func loadTestDatabaseDsn() (string, error) {
 	)
 
 	return fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s",
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		host,
 		port,
 		user,
@@ -45,29 +42,28 @@ func loadTestDatabaseDsn() (string, error) {
 	), nil
 }
 
+// NewTestDb creates a new test database handler
 func NewTestDb(t *testing.T) db.DatabaseHandler {
 	dsn, err := loadTestDatabaseDsn()
-	assert.NoError(t, err)
+	require.NoError(t, err, "Failed to load test database DSN")
 
-	db, err := db.InitDatabaseHandler(dsn, &gorm.Config{})
-	assert.NoError(t, err)
+	database, err := db.InitDatabaseHandler(dsn, &gorm.Config{})
+	require.NoError(t, err, "Failed to initialize database")
 
-	t.Cleanup(func() {
-		defer db.Close()
+	return database
+}
 
-		// Get the directory of the current file
-		_, currentFile, _, _ := runtime.Caller(0)
-		currentDir := filepath.Dir(currentFile)
+// WithTransaction runs the test function within a transaction and rolls it back afterward
+func WithTransaction(t *testing.T, db db.DatabaseHandler, testFn func(ctx context.Context)) {
+	ctx := context.Background()
 
-		// Construct the absolute path to teardown.sql
-		teardownPath := filepath.Join(currentDir, "testdata", "teardown.sql")
-
-		teardownScript, err := os.ReadFile(teardownPath)
-		assert.NoError(t, err)
-
-		err = db.GetDB(context.Background()).Exec(string(teardownScript)).Error
-		assert.NoError(t, err)
+	err := db.RunTransaction(ctx, func(txCtx context.Context) error {
+		testFn(txCtx)
+		// Always return an error to force rollback
+		return fmt.Errorf("force rollback")
 	})
 
-	return db
+	// We expect an error because we're forcing a rollback
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "force rollback")
 }

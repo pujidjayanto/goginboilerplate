@@ -8,10 +8,10 @@ import (
 )
 
 type Purchase struct {
-	ID           uint            `gorm:"primaryKey"`
+	Id           uint            `gorm:"primaryKey"`
 	UserId       uint            `gorm:"not null"`
 	ProductId    uint            `gorm:"not null"`
-	PurchaseDate time.Time       `gorm:"autoCreateTime"` // todo: need to investigate on this
+	PurchaseDate time.Time       `gorm:"autoCreateTime"`
 	Quantity     int             `gorm:"not null"`
 	CreatedAt    time.Time       `gorm:"autoCreateTime"`
 	User         user.User       `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
